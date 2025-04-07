@@ -25,7 +25,10 @@ def importdata():
                 session.add(category_obj)
             else:
                 category_obj = possible_category
-            session.add(Product(inventory=info['available'], price=info['price'], name=info['name'], category=category_obj))
+            session.add(Product(qty=info['available'], 
+                                price=info['price'], 
+                                name=info['name'], 
+                                category=category_obj))
         session.commit()
     with open("customers.csv","r") as fp:
         reader = csv.DictReader(fp)
