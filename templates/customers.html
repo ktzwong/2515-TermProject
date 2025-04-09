@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='customers.css') }}">
+</head>
+<body>
+    <div class="customers-container">
+        <h1>All Customers</h1>
+        <ul class="customers-list">
+            {% for customer in data %}
+            <li>
+                <span class="customer-name">{{ customer.name }}</span>
+                <span class="customer-phone">({{ customer.phone }})</span>
+                <a class="customer-link" href="{{ url_for('customer_detail', id=customer.id) }}">
+                    View Details
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        <a class="customer-link" href="{{ url_for('home') }}">← Back to Homepage</a>
+    </div>
+</body>
+</html>

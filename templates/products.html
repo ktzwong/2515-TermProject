@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% if category %}Products in {{ category }}{% else %}All Products{% endif %}
+    </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="customers-container">
+        <h1>
+            {% if category %}Products in "{{ category }}"{% else %}All Products{% endif %}
+        </h1>
+
+        {% if data %}
+        <ul class="customers-list">
+            {% for product in data %}
+            <li>
+                <div class="customer-info">
+                    <span class="customer-name">{{ product.name }}</span>
+                    <span class="customer-phone">Quantity: {{ product.qty }}</span>
+                    {% if product.price is defined %}
+                        <span class="customer-phone">Price: ${{ product.price }}</span>
+                    {% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No products found.</p>
+        {% endif %}
+
+        <br>
+        {% if category %}
+        <a class="customer-link" href="{{ url_for('show_categories') }}">← Back to Categories</a>
+        {% else %}
+        <a class="customer-link" href="{{ url_for('home') }}">← Back to Homepage</a>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -10,5 +10,5 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 engine = create_engine("sqlite:///store.db", echo=True)
-Session = sessionmaker(bind=engine)
+session = sessionmaker(bind=engine)
 

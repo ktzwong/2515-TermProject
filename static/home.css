@@ -1,0 +1,30 @@
+.home-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding-top: 50px;
+    text-align: center;
+}
+
+.home-container h1 {
+    font-size: 2.5em;
+    color: #007BFF;
+}
+
+.home-links {
+    margin-top: 40px;
+}
+
+.home-links a {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.home-links a:hover {
+    background-color: #0056b3;
+}

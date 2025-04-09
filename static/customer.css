@@ -1,0 +1,29 @@
+.customer-detail {
+    max-width: 600px;
+    margin: 0 auto;
+    padding-top: 40px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.customer-detail h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.customer-detail p {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.customer-detail a {
+    display: inline-block;
+    margin-top: 20px;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.customer-detail a:hover {
+    text-decoration: underline;
+}
