@@ -5,6 +5,7 @@ from db import db
 from sqlalchemy import select
 from app import app
 
+
 #Make the table
 def create_tables():
     Base.metadata.create_all(db.engine)
@@ -80,12 +81,21 @@ def get_customer():
 #Start session code
 if __name__ == "__main__":
     with app.app_context():
-        drop_tables()
-        create_tables()
-        import_data()
-        obj = Category(name='diary')
-        db.session.add(obj)
-        db.session.commit()
+        if 'start' in sys.argv:
+            drop_tables()
+            create_tables()
+            import_data()
+        elif 'get_products' in sys.argv:
+            get_products()
+        elif 'no_stock' in sys.argv:
+            no_stock()
+        elif "customer" in sys.argv:
+            get_customer()
+'''     elif "products_by_cat" in sys.argv:
+            get_category()
+        elif "gen_cus" in sys.argv:
+            rand_customer()
+'''
 
 
 '''

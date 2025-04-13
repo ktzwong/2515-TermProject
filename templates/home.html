@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="customers-container">
-        <h1>Welcome to the Food Store</h1>
-        <ul class="customers-list">
-            <li><a class="customer-link" href="{{ url_for('show_products') }}">Products</a></li>
-            <li><a class="customer-link" href="{{ url_for('show_categories') }}">Categories</a></li>
-            <li><a class="customer-link" href="{{ url_for('show_customers') }}">Customers</a></li>
-        </ul>
+{% extends "base.html" %}
+
+{% block title %}Welcome to the Food Store{% endblock %}
+
+{% block content %}
+    <div class="text-center">
+        <h1>Yummy Food Store</h1>
+        <div class="d-grid gap-3 col-6 mx-auto mt-4">
+            <a class="btn btn-primary" href="{{ url_for('show_products') }}">View Products</a>
+            <a class="btn btn-primary" href="{{ url_for('show_categories') }}">View Categories</a>
+            <a class="btn btn-primary" href="{{ url_for('show_customers') }}">View Customers</a>
+        </div>
     </div>
-</body>
-</html>
+{% endblock %}

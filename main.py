@@ -1,94 +1,83 @@
 import csv
 import sys
-from model import Product,Base,Customer,Category
-from db import Session, engine
+from app import app, db, Product, Customer, Category
 from sqlalchemy import select
 
-#Make the table
-def create():
-    Base.metadata.create_all(engine)
-    
-#Remove table
-def drop():
-    Base.metadata.drop_all(engine)
 
-    
-def importdata():
-    session = Session()
-    with open ("products.csv" , "r") as fp:
-        reader = csv.DictReader(fp)
-       #Filter category             
-        for info in reader:
-            possible_category = session.execute(select(Category).where(Category.name == info["category"])).scalar()        
-            if not possible_category:
-                category_obj = Category(name=info['category'])
-                session.add(category_obj)
-            else:
-                category_obj = possible_category
-            session.add(Product(qty=info['available'], 
-                                price=info['price'], 
-                                name=info['name'], 
-                                category=category_obj))
-        session.commit()
-    with open("customers.csv","r") as fp:
+def create_tables():
+    db.drop_all()
+    db.create_all()
+    print("✅ Tables dropped and created.")
+
+
+def import_data():
+    with open("products.csv", "r") as fp:
         reader = csv.DictReader(fp)
         for info in reader:
-            session.add(Customer(name=info['name'], phone=info['phone']))
-        session.commit()
+            # Check if category exists
+            category = db.session.execute(
+                select(Category).where(Category.name == info["category"])
+            ).scalar()
+            if not category:
+                category = Category(name=info["category"])
+                db.session.add(category)
+
+            # Add product
+            product = Product(
+                name=info["name"],
+                qty=int(info["available"]),
+                price=float(info["price"]),
+                category=category
+            )
+            db.session.add(product)
+
+        db.session.commit()
+        print(" Products imported.")
+
+    with open("customers.csv", "r") as fp:
+        reader = csv.DictReader(fp)
+        for info in reader:
+            customer = Customer(name=info["name"], phone=info["phone"])
+            db.session.add(customer)
+
+        db.session.commit()
+        print(" Customers imported.")
 
 
-def get_products():
-    session = Session()
-    statement = select(Product)
-    results = session.execute(statement)
-    #Allowing either name or object
-    inquiry = input("Object?(Y/N)")
-    if inquiry == "Y":
-        for prod in results.scalars():
-            print(prod)
-    else:
-        for prod in results.scalars():
-            print(prod.name)
-
-def no_stock():
-    session = Session()
-    statement = select(Product).where(Product.inventory < 1)
-    results = session.execute(statement)
-    #Allowing either name or object
-    inquiry = input("Object?(Y/N)")
-    if inquiry == "Y":
-        for prod in results.scalars():
-            print(prod)
-    else:
-        for prod in results.scalars():
-            print(prod.name)
-
-def get_customer():
-    session = Session()
-    inquiry = input("What is the name? ")
-    statement = select(Customer).where(Customer.name.ilike(inquiry))
-    results = session.execute(statement)
-    inquiry = input("Object?(Y/N)")
-    if inquiry == "Y":
-        for cus in results.scalars():
-            print(cus)
-    else:
-        for cus in results.scalars():
-            print(cus.name)
+def list_products():
+    products = db.session.execute(select(Product)).scalars()
+    for p in products:
+        print(f"{p.name} - {p.qty} in stock")
 
 
+def out_of_stock():
+    products = db.session.execute(
+        select(Product).where(Product.qty < 1)
+    ).scalars()
+    for p in products:
+        print(f"{p.name} is out of stock")
 
-                
-#Start session code
+
+def find_customer():
+    name = input("Enter customer name: ")
+    customers = db.session.execute(
+        select(Customer).where(Customer.name.ilike(name))
+    ).scalars()
+    for c in customers:
+        print(f"{c.name} - {c.phone}")
+
+
+# CLI Entry point
 if __name__ == "__main__":
-    if 'start' in sys.argv:
-        drop()
-        create()
-        importdata()
-    elif 'get_products' in sys.argv:
-        get_products()
-    elif 'no_stock' in sys.argv:
-        no_stock()
-    elif "customer" in sys.argv:
-        get_customer()
-    print("Done")
+    with app.app_context():
+        if 'start' in sys.argv:
+            create_tables()
+            import_data()
+        elif 'get_products' in sys.argv:
+            list_products()
+        elif 'no_stock' in sys.argv:
+            out_of_stock()
+        elif "customer" in sys.argv:
+            find_customer()
+        else:
+            print("No valid command provided.")

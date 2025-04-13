@@ -1,27 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Categories</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="customers-container">
-        <h1>Categories</h1>
-        <ul class="customers-list">
-            {% for category in data %}
-            <li>
-                <div class="customer-info">
-                    <span class="customer-name">{{ category.name }}</span>
-                    <a class="customer-link" href="{{ url_for('category_products', category_name=category.name) }}">
-                        View Products
-                    </a>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-        <br>
-        <a class="customer-link" href="{{ url_for('home') }}">← Back to Homepage</a>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+    <h1>Categories</h1>
+    <ul class="customers-list">
+        {% for category in data %}
+        <li>
+            <div class="customer-info">
+                <span class="customer-name">{{ category.name }}</span>
+            </div>
+            <a class="customer-link" href="{{ url_for('category_products', category_name=category.name) }}">
+                View Products
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a class="customer-link" href="{{ url_for('home') }}">← Back to Homepage</a>
+{% endblock %}
