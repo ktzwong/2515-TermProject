@@ -1,0 +1,21 @@
+meta {
+  name: Creating Orders
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://127.0.0.1:8888/api/orders
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "phone": "778-230-5730",
+    "product": [
+      ["apple", 2],
+      ["bread", 3]
+    ]
+  }
+}

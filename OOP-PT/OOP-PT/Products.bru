@@ -1,0 +1,21 @@
+meta {
+  name: Products
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://127.0.0.1:8888/api/products
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "milk",
+    "qty": 10,
+    "price": 4.99,
+    "category": "dairy"
+  }
+  
+}

@@ -2,9 +2,8 @@ from flask import Flask, render_template, redirect, url_for, request
 from pathlib import Path
 from db import db
 from sqlalchemy.orm import mapped_column, relationship
-from model import Product, Category, ProductOrder, Order, Customer
-from routes.api import api_bp
-
+from routes import api_bp
+from models import Customer, Product, Category, Order, ProductOrder
 
 
 app = Flask(__name__)
@@ -77,42 +76,6 @@ def complete_order_view(id):
     db.session.commit()
     return redirect(url_for('order_detail', id=id))
 
-
-
-
-
-'''
-@app.route("/order/<int:id>/complete", methods=['GET', 'POST'])
-def complete_order_view(id):
-    order = db.session.execute(db.select(Order).where(Order.id == id)).scalar()
-    if not order:
-        return render_template("error.html", message="Order not found"), 404
-
-    result, message = order.complete()
-    if not result:
-        return render_template("error.html", message=message), 400
-
-    db.session.commit()
-    return redirect(url_for('order_detail', id=id))
-'''
-
-'''    else:
-        order = db.session.execute(db.select(Order).where(Order.id == id)).scalar()
-        result, message = order.complete()
-        if result == False:
-            return redirect(url_for('error_page', message=message))
-        db.session.commit()
-        return redirect(url_for('order_detail', id=id)) 
-'''    
-
-'''else:    
-        from manage import complete_order
-        result, message =  complete_order(id)
-        if result == False:
-            return redirect(url_for('error_page', message=message))
-       
-        return redirect(url_for('order_detail', id=id)) 
-'''
 
 @app.route("/error")
 def error_page():

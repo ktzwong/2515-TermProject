@@ -1,19 +1,22 @@
 import csv
 import sys
-from model import Product,Base,Customer,Category, ProductOrder, Order
 from db import db
-from sqlalchemy import select, func, insert, update
+from sqlalchemy import select, update
 from app import app
 from random import randint
 from datetime import datetime as dt
 from datetime import timedelta
 from sqlalchemy.exc import SQLAlchemyError
-from flask import Flask, redirect, url_for
+from models import Customer, Product, Category, Order, ProductOrder
+
+
+def drop_tables():
+    db.drop_all()
+    print("Dropped tables")
 
 def create_tables():
-    db.drop_all()
     db.create_all()
-    print("✅ Tables dropped and created.")
+    print("Tables created.")
     
 
 def import_data():
@@ -79,7 +82,6 @@ def create_rand_order():
     # Get random customer
     random_customer = db.session.execute(db.select(Customer).order_by(db.func.random())).scalar()
     
-    # Generate random time in the past
     random_time = dt.now() - timedelta(days=randint(1,3), hours=randint(0,15), minutes=randint(0,30))
     
     # Create new order
@@ -93,15 +95,13 @@ def create_rand_order():
     
     # Create product orders
     for product in random_prods:
-        quantity = randint(1, 5)  # Random quantity between 1 and 5
+        quantity = randint(1, 5) 
         product_order = ProductOrder(
             product_id= product.id,
             order_id= new_order.id,
             qty = quantity
         )
         db.session.add(product_order)
-    
-    # Commit all changes to database
     db.session.commit()
     
     print(f"Created order {new_order} for customer {random_customer.name} with {num_prods} products")
@@ -126,13 +126,10 @@ def complete_order(id):
                     ))
 
         estimated_amount = order.estimate()
-        # Create the update statement with correct syntax
         stmt = update(Order).where(Order.id == id).values(
             completed=dt.now(),
             amount=estimated_amount
         )
-        
-        # Execute the statement properly
         db.session.execute(stmt)
         db.session.commit() 
         
@@ -150,6 +147,8 @@ if __name__ == "__main__":
         if 'start' in sys.argv:
             create_tables()
             import_data()
+        elif 'drop' in sys.argv:
+            drop_tables()
         elif 'get_products' in sys.argv:
             get_products()
         elif 'no_stock' in sys.argv:

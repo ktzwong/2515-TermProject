@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint, request
 from db import db
-from model import Product, Order, Category, Customer, ProductOrder
 from sqlalchemy import select
+from models import Customer, Product, Category, Order, ProductOrder
 
 api_bp = Blueprint("api", __name__)
 
@@ -80,5 +80,76 @@ def check_order(id):
 
     order.complete()
     db.session.commit()
-
     return jsonify(order.to_json()), 200
+
+'''Create new order'''
+@api_bp.route("/orders", methods=["POST"])
+def create_order():
+    data = request.json
+    if "phone" not in data:
+        return {"message": "Need phone number"}, 400
+    customer = db.session.execute(db.select(Customer).where(Customer.phone == data["phone"])).scalar()
+    if customer is None:
+          return {"message": "Need customer"}, 400
+    
+    if "product" not in data:
+        return {"message": "not a valid food"}, 400
+    
+    new_order = Order(customer=customer)
+    db.session.add(new_order)
+    db.session.flush()  ## needed because we created a empty PK 
+    
+    for item in data["product"]:
+        name, qty = item
+        product = db.session.execute(db.select(Product).where(Product.name == name)).scalar()
+    
+        if product is None:
+            return {"message": "Product not found"}, 400
+
+        if qty <= 0:
+            return {"message": f"Invalid quantity for '{name}'"}, 400
+        
+        db.session.add(ProductOrder(order_id=new_order.id,
+                                    product_id=product.id,
+                                    qty=qty))
+    db.session.commit()
+    return jsonify(new_order.to_json()), 201
+    
+
+'''adding product'''
+@api_bp.route("/products", methods=["POST"])
+def create_product():
+    data = request.json
+
+    if "name" not in data or not data["name"].strip():
+        return {"message": "Product name is required"}, 400
+    if "price" not in data or data["price"] <= 0:
+        return {"message": "Valid product price is required"}, 400
+    if "category" not in data or not data["category"].strip():
+        return {"message": "Category is required"}, 400
+
+    qty = data.get("qty", 0)
+    if not  qty < 0:
+        return {"message": "Invalid quantity"}, 400
+
+    category = db.session.execute(
+        db.select(Category).where(Category.name == data["category"])
+    ).scalar()
+
+    # Create category if it doesn't exist
+    if category is None:
+        category = Category(name=data["category"])
+        db.session.add(category)
+        db.session.flush()  # Needed so category.id exists
+
+    # Create and add product
+    product = Product(
+        name=data["name"].strip(),
+        price=data["price"],
+        qty=qty,
+        category=category
+    )
+    db.session.add(product)
+    db.session.commit()
+
+    return jsonify(product.to_json()), 201  

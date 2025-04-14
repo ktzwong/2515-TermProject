@@ -1,0 +1,15 @@
+meta {
+  name: Strategy
+  type: http
+  seq: 3
+}
+
+put {
+  url: http://127.0.0.1:8888/api/orders/5
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {"strategy":"delete"}
+}
