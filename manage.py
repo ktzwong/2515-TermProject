@@ -1,19 +1,19 @@
 import csv
 import sys
-from model import Product,Base,Customer,Category
+from model import Product,Base,Customer,Category, ProductOrder, Order
 from db import db
-from sqlalchemy import select
+from sqlalchemy import select, func, insert, update
 from app import app
+from random import randint
+from datetime import datetime as dt
+from datetime import timedelta
+from sqlalchemy.exc import SQLAlchemyError
+from flask import Flask, redirect, url_for
 
-
-#Make the table
 def create_tables():
-    Base.metadata.create_all(db.engine)
-    
-#Remove table
-def drop_tables():
-    Base.metadata.drop_all(db.engine)
-
+    db.drop_all()
+    db.create_all()
+    print("✅ Tables dropped and created.")
     
 
 def import_data():
@@ -75,14 +75,79 @@ def get_customer():
         for cus in results.scalars():
             print(cus.name)
 
+def create_rand_order():
+    # Get random customer
+    random_customer = db.session.execute(db.select(Customer).order_by(db.func.random())).scalar()
+    
+    # Generate random time in the past
+    random_time = dt.now() - timedelta(days=randint(1,3), hours=randint(0,15), minutes=randint(0,30))
+    
+    # Create new order
+    new_order = Order(customer_id=random_customer.id, created=random_time)
+    db.session.add(new_order)
+    db.session.flush()  
+    
+    # Get random products
+    num_prods = randint(4, 6)
+    random_prods = db.session.execute(db.select(Product).order_by(db.func.random()).limit(num_prods)).scalars().all()
+    
+    # Create product orders
+    for product in random_prods:
+        quantity = randint(1, 5)  # Random quantity between 1 and 5
+        product_order = ProductOrder(
+            product_id= product.id,
+            order_id= new_order.id,
+            qty = quantity
+        )
+        db.session.add(product_order)
+    
+    # Commit all changes to database
+    db.session.commit()
+    
+    print(f"Created order {new_order} for customer {random_customer.name} with {num_prods} products")
+    return new_order
 
+def complete_order(id):
+    try:
+        # Find the order to calculate the estimate
+        order = db.session.get(Order, id)
+        
+        if not order:
+            return False, "Order not found"
+        elif order:
+            for item in order.product_order:  
+                product = item.product
+                if item.qty > product.qty:
+                    return False, f'{product.name} does not have enough quantity ({product.qty})'
+                   
+                else:
+                    db.session.execute(update(Product).where(Product.id == product.id).values(
+                        qty = product.qty - item.qty
+                    ))
+
+        estimated_amount = order.estimate()
+        # Create the update statement with correct syntax
+        stmt = update(Order).where(Order.id == id).values(
+            completed=dt.now(),
+            amount=estimated_amount
+        )
+        
+        # Execute the statement properly
+        db.session.execute(stmt)
+        db.session.commit() 
+        
+        return True, "Order completed successfully"
+        
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return False, f"Database error: {str(e)}"
+    
 
                 
 #Start session code
 if __name__ == "__main__":
     with app.app_context():
         if 'start' in sys.argv:
-            drop_tables()
             create_tables()
             import_data()
         elif 'get_products' in sys.argv:
@@ -91,23 +156,5 @@ if __name__ == "__main__":
             no_stock()
         elif "customer" in sys.argv:
             get_customer()
-'''     elif "products_by_cat" in sys.argv:
-            get_category()
-        elif "gen_cus" in sys.argv:
-            rand_customer()
-'''
-
-
-'''
-    if 'start' in sys.argv:
-        drop()
-        create()
-        importdata()
-    elif 'get_products' in sys.argv:
-        get_products()
-    elif 'no_stock' in sys.argv:
-        no_stock()
-    elif "customer" in sys.argv:
-        get_customer()
-    print("Done")
-'''
+        elif "random" in sys.argv:
+            create_rand_order()

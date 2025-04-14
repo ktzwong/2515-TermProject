@@ -4,6 +4,7 @@ from app import app, db, Product, Customer, Category
 from sqlalchemy import select
 
 
+
 def create_tables():
     db.drop_all()
     db.create_all()
@@ -79,5 +80,7 @@ if __name__ == "__main__":
             out_of_stock()
         elif "customer" in sys.argv:
             find_customer()
+        elif "random" in sys.argv:
+            create_rand_order()
         else:
             print("No valid command provided.")

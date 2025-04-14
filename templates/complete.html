@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Order{% endblock %}
+
+{% block content %}
+<div class="container">
+    <form method="POST" action="{{ url_for('complete_order_view', id=data) }}">
+        <button type="submit" class="btn btn-success mt-4">Mark as Completed</button>
+    </form>
+
+    <br>
+    <a class="customer-link" href="{{ url_for('order_detail', id=data) }}">← Back to Order Details</a>
+</div>
+{% endblock %}

@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Customer Details{% endblock %}
+{% block title %}Customer {{ data.name }}{% endblock %}
 
 {% block content %}
+<div class="container">
     <h1>Customer Details</h1>
     <div class="customers-list">
         <div class="customer-info">
@@ -10,6 +11,45 @@
             <span class="customer-phone">Phone: {{ data.phone }}</span>
         </div>
     </div>
+
+    <br>
+    <h2>Pending Orders</h2>
+    {% if data.pending_orders() %}
+        <ul class="customers-list">
+            {% for order in data.pending_orders() %}
+            <li>
+                <div class="customer-info">
+                    <span class="customer-name">Order #{{ order.id }}</span>
+                    <span class="customer-phone">Created: {{ order.created.strftime('%Y-%m-%d %H:%M') }}</span>
+                    <a class="customer-link" href="{{ url_for('order_detail', id=order.id) }}">View Order</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No pending orders.</p>
+    {% endif %}
+
+    <br>
+    <h2>Completed Orders</h2>
+    {% if data.completed_orders() %}
+        <ul class="customers-list">
+            {% for order in data.completed_orders() %}
+            <li>
+                <div class="customer-info">
+                    <span class="customer-name">Order #{{ order.id }}</span>
+                    <span class="customer-phone">Completed: {{ order.completed.strftime('%Y-%m-%d %H:%M') }}</span>
+                    <span class="customer-phone">Amount: ${{ "%.2f"|format(order.amount) }}</span>
+                    <a class="customer-link" href="{{ url_for('order_detail', id=order.id) }}">View Order</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No completed orders.</p>
+    {% endif %}
+
     <br>
     <a class="customer-link" href="{{ url_for('show_customers') }}">← Back to Customers</a>
+</div>
 {% endblock %}

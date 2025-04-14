@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Oops! Something went wrong.</h1>
+    <p>{{ data }}</p>
+    <a class="customer-link" href="{{ url_for('home') }}">← Back to Homepage</a>
+</div>
+{% endblock %}

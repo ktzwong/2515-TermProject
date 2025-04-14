@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ data.id }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Order #{{ data.id }}</h1>
+
+    <p><strong>Customer:</strong> 
+        <a href="{{ url_for('customer_detail', id=data.customer.id) }}">
+            {{ data.customer.name }}
+        </a>
+    </p>
+
+    <p><strong>Created:</strong> {{ data.created.strftime("%Y-%m-%d %H:%M") }}</p>
+    <p><strong>Status:</strong> 
+        {% if data.completed %}
+            <span class="text-success">Completed on {{ data.completed.strftime('%Y-%m-%d %H:%M') }}</span>
+        {% else %}
+            <span class="text-danger">Pending</span>
+        {% endif %}
+    </p>
+
+    <h2>Items</h2>
+    <ul class="customers-list">
+        {% for item in data.product_order %}
+        <li>
+            <div class="customer-info">
+                <span class="customer-name">{{ item.product.name }}</span>
+                <span class="customer-phone">Quantity: {{ item.qty }}</span>
+                <span class="customer-phone">Price: ${{ "%.2f"|format(item.product.price) }}</span>
+                <span class="customer-phone">Subtotal: ${{ "%.2f"|format(item.qty * item.product.price) }}</span>
+                {% if item.qty > item.product.qty %}
+                    <span class="customer-phone text-danger">
+                        Not enough stock! (Only {{ item.product.qty }} available)
+                    </span>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h3>Estimated Total: ${{ "%.2f"|format(data.estimate()) }}</h3>
+
+    {% if not data.completed %}
+    <form method="POST" action="{{ url_for('complete_order_view', id=data.id) }}">
+        <button type="submit" class="btn btn-primary">Complete Order</button>
+    </form>
+    {% endif %}
+
+    <br>
+    <a class="customer-link" href="{{ url_for('show_orders') }}">← Back to Orders</a>
+</div>
+{% endblock %}
