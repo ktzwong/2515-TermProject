@@ -9,7 +9,10 @@ class Customer(db.Model):
     name = mapped_column(String)
     phone = mapped_column(String,unique=True)
     order = relationship("Order", back_populates="customer")
+    money = mapped_column(Integer,default=0)
+    status = mapped_column(String,default="regular")
 
+    
 #checking for pending orders
     def pending_orders(self):
         pending_orders = []
@@ -30,6 +33,8 @@ class Customer(db.Model):
             "id": self.id,
             "name": self.name,
             "phone": self.phone,
+            "status":self.status,
+            "money":self.money,
             "pending_orders": [o.to_json() for o in self.pending_orders()],
             "completed_orders": [o.to_json() for o in self.completed_orders()]
         }

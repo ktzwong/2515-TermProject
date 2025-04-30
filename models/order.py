@@ -12,7 +12,7 @@ class Order(db.Model):
         created = mapped_column(DateTime, default=datetime.now)
         completed = mapped_column(DateTime, nullable=True)
         amount = mapped_column(Float, nullable=True)
-
+        delivery = mapped_column(String, default=True)
         product_order = relationship("ProductOrder", back_populates="order")
         customer = relationship("Customer", back_populates="order")
 
@@ -42,6 +42,7 @@ class Order(db.Model):
                 "amount": self.amount,
                 "created": self.created,
                 "completed_date": self.completed,
+                "delivery method": self.delivery
             }
             if self.completed is not None:
                 json["items"] = [{"item":item.product.name,"price":item.product.price,"quantity":item.qty} for item in self.product_order]

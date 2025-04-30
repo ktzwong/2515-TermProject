@@ -4,7 +4,9 @@ from db import db
 from sqlalchemy.orm import mapped_column, relationship
 from routes import api_bp
 from models import Customer, Product, Category, Order, ProductOrder
+from routes.html import html_routes
 
+#add this to app.py
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///store.db"
@@ -13,79 +15,79 @@ db.init_app(app)
 
 
 app.register_blueprint(api_bp, url_prefix="/api")
+app.register_blueprint(html_routes)
 
 
 
+# '''routes'''
+# @app.route("/")
+# def home():
+#     return render_template("home.html")
 
-'''routes'''
-@app.route("/")
-def home():
-    return render_template("home.html")
+# '''Products'''
+# @app.route("/products")
+# def show_products():
+#     products = db.session.execute(db.select(Product)).scalars()
+#     return render_template("products.html", data = products)
 
-'''Products'''
-@app.route("/products")
-def show_products():
-    products = db.session.execute(db.select(Product)).scalars()
-    return render_template("products.html", data = products)
+# '''Categories'''
+# @app.route("/categories")
+# def show_categories():
+#     categories = db.session.execute(db.select(Category)).scalars()
+#     return render_template("categories.html", data = categories)
 
-'''Categories'''
-@app.route("/categories")
-def show_categories():
-    categories = db.session.execute(db.select(Category)).scalars()
-    return render_template("categories.html", data = categories)
-
-@app.route("/categories/<string:category_name>")
-def category_products(category_name):
-    products = db.session.execute(db.select(Product).where(Product.category.has(Category.name == category_name))).scalars()
-    return render_template("products.html", category=category_name, data=products)
+# @app.route("/categories/<string:category_name>")
+# def category_products(category_name):
+#     products = db.session.execute(db.select(Product).where(Product.category.has(Category.name == category_name))).scalars()
+#     return render_template("products.html", category=category_name, data=products)
 
 
-'''Customers'''
-@app.route("/customers")
-def show_customers():
-    customers = db.session.execute(db.select(Customer)).scalars()
-    return render_template("customers.html", data = customers )
+# '''Customers'''
+# @app.route("/customers")
+# def show_customers():
+#     customers = db.session.execute(db.select(Customer)).scalars()
+#     return render_template("customers.html", data = customers )
 
-@app.route("/customers/<int:id>")
-def customer_detail(id):
-    customer = db.session.execute(db.select(Customer).where(Customer.id == id)).scalar()
-    return render_template("customer.html", data=customer)
+# @app.route("/customers/<int:id>")
+# def customer_detail(id):
+#     customer = db.session.execute(db.select(Customer).where(Customer.id == id)).scalar()
+#     return render_template("customer.html", data=customer)
 
-'''Orders'''
-@app.route("/orders")
-def show_orders():
-    orders = db.session.execute(db.select(Order)).scalars()
-    return render_template("orders.html", data = orders)
+# '''Orders'''
+# @app.route("/orders")
+# def show_orders():
+#     orders = db.session.execute(db.select(Order)).scalars()
+#     return render_template("orders.html", data = orders)
 
-@app.route("/order/<int:id>")
-def order_detail(id):
-    order = db.session.execute(db.select(Order).where(Order.id == id)).scalar()
-    return render_template("order.html", data = order)
+# @app.route("/order/<int:id>")
+# def order_detail(id):
+#     order = db.session.execute(db.select(Order).where(Order.id == id)).scalar()
+#     return render_template("order.html", data = order)
 
-@app.route("/order/<int:id>/complete", methods=['GET', 'POST'])
-def complete_order_view(id):
-    order = db.session.get(Order, id)
+# @app.route("/order/<int:id>/complete", methods=['GET', 'POST'])
+# def complete_order_view(id):
+#     order = db.session.get(Order, id)
     
-    if not order:
-        return render_template("error.html", message="Order not found"), 404
+#     if not order:
+#         return render_template("error.html", message="Order not found"), 404
 
-    result, message = order.complete()
-    if not result:
-        return render_template("error.html", message=message), 400
+#     result, message = order.complete()
+#     if not result:
+#         return render_template("error.html", message=message), 400
 
-    db.session.commit()
-    return redirect(url_for('order_detail', id=id))
+#     db.session.commit()
+#     return redirect(url_for('order_detail', id=id))
 
 
-@app.route("/error")
-def error_page():
-    data = request.args.get('message', 'An unknown error occurred')
-    return render_template("error.html", data=data)
+# @app.route("/error")
+# def error_page():
+#     data = request.args.get('message', 'An unknown error occurred')
+#     return render_template("error.html", data=data)
     
-'''
-will run the flask web application, in debug mode, that listens on port 8888
-listens on local interfaces, access via localhost or 127.0.0.1 
-'''
+# '''
+# will run the flask web application, in debug mode, that listens on port 8888
+# listens on local interfaces, access via localhost or 127.0.0.1 
+# '''
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8888)
+     app.run(debug=True, port=8888)

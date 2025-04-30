@@ -153,3 +153,42 @@ def create_product():
     db.session.commit()
 
     return jsonify(product.to_json()), 201  
+
+
+@api_bp.route("/exam/customers/<int:id>", methods=["PUT"])
+def update_customer(id):
+    data = request.json
+    Customer = db.session.execute(db.select(Customer).where(Customer.id == id)).scalar()
+    if Customer is None:
+        return {"message": "Cannot find customer"}, 404
+    if "money" in data:
+        if data["money"] < 0:
+                return {"message": "not a valid price"}, 400
+        Customer.money = data["money"]
+
+    if "status" in data:
+        if data["status"] ==True:
+            Customer.status = data["status"]
+        else:
+            Customer.status = data["status"]
+    db.session.commit()
+    return jsonify(Customer.to_json()), 200
+
+@api_bp.route("/exam/deliver/<int:id>", methods=["PUT"])
+def update_delivery(id):
+    data = request.json
+    order = db.session.execute(db.select(Order).where(Order.id == id)).scalar()
+    if Order is None:
+        return {"message": "Cannot find Order"}, 404
+    if data["delivery"] == True:
+            Customer.delivery = data["delivery"]
+    elif "delivery" in data["delivery"] == False:
+        
+
+    if "status" in data:
+        if data["status"] ==True:
+            Customer.status = data["status"]
+        else:
+            Customer.status = data["status"]
+    db.session.commit()
+    return jsonify(Customer.to_json()), 200

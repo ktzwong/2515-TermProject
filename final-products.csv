@@ -1,0 +1,6 @@
+name,price,available,category
+one dollar,1.00,0,price
+three dollars,3.00,0,price
+five dollars,5.00,0,price
+expensive,500.00,0,final
+passing grade,1000.00,0,final
